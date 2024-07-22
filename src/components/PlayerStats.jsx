@@ -20,6 +20,7 @@ const PlayerStats = ({ stats }) => {
             <th>Position</th>
             <th>Strength</th>
             <th>Goals</th>
+            <th>Strength Change</th>
           </tr>
         </thead>
         <tbody>
@@ -30,6 +31,7 @@ const PlayerStats = ({ stats }) => {
               <td>{player.position}</td>
               <td>{player.strength.toFixed(2)}</td>
               <td>{player.goals}</td>
+              <td>{player.strengthChange}</td>
             </tr>
           ))}
         </tbody>

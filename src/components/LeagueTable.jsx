@@ -5,7 +5,11 @@ import TeamTable from './TeamTable';
 import MatchResults from './MatchResults';
 import SeasonSummary from './SeasonSummary';
 import PlayerStats from './PlayerStats';
-import { initializeTable, initializePlayerStats, updateTable, determineTopScorer, updatePlayerStats } from '../utils/tableUtils';
+import { initializeTable } from '../utils/initializeTable';
+import { initializePlayerStats } from '../utils/initializePlayerStats';
+import { updateTable } from '../utils/updateTable';
+import { determineTopScorer } from '../utils/determineTopScorer';
+import { updatePlayerStats } from '../utils/updatePlayerStats';
 
 const LeagueTable = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
@@ -16,39 +20,61 @@ const LeagueTable = () => {
   const [seasonEnded, setSeasonEnded] = useState(false);
 
   useEffect(() => {
-    setTable(initializeTable(teamsData));
-    setPlayerStats(initializePlayerStats(teamsData));
+    const initialTable = initializeTable(teamsData);
+    const initialPlayerStats = initializePlayerStats(teamsData);
+    setTable(initialTable);
+    setPlayerStats(initialPlayerStats);
   }, []);
 
   const handleNextWeek = () => {
     if (seasonEnded) return;
 
-    const newMatches = [...matches];
+    const newMatches = [];
     const weekMatches = [];
 
     for (let i = 0; i < teamsData.length; i += 2) {
       if (i + 1 < teamsData.length) {
-        const result = simulateMatch(teamsData[i], teamsData[i + 1]);
+        const isHomeTeamA = (currentWeek % 2 === 0);
+        const result = simulateMatch(teamsData[i], teamsData[i + 1], isHomeTeamA);
         weekMatches.push(result);
-        setTable(prevTable => updateTable(prevTable, result));
-        setPlayerStats(prevStats => updatePlayerStats(prevStats, result));
+        setPlayerStats(prevStats => {
+          const updatedStats = updatePlayerStats(prevStats, result);
+          setTable(prevTable => updateTable(prevTable, result, updatedStats));
+          return updatedStats;
+        });
       }
     }
-    newMatches.push({ week: currentWeek + 1, matches: weekMatches });
-    setMatches(newMatches);
+    newMatches.unshift({ week: currentWeek + 1, matches: weekMatches }); // Yeni haftayı en üste ekleyin
+    setMatches([...newMatches, ...matches]);
     setCurrentWeek(currentWeek + 1);
 
     if (currentWeek + 1 >= (teamsData.length - 1) * 2) {
       setSeasonEnded(true);
-      setTopScorer(determineTopScorer(newMatches));
+      setTopScorer(determineTopScorer([...newMatches, ...matches]));
     }
   };
 
   const resetSeason = () => {
+    const initialTable = table.map(team => ({
+      ...team,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      goalsFor: 0,
+      goalsAgainst: 0,
+      points: 0
+    }));
+
+    const initialPlayerStats = playerStats.map(player => ({
+      ...player,
+      goals: 0
+    }));
+
     setCurrentWeek(0);
     setMatches([]);
-    setTable(initializeTable(teamsData));
-    setPlayerStats(initializePlayerStats(teamsData));
+    setTable(initialTable);
+    setPlayerStats(initialPlayerStats);
     setTopScorer(null);
     setSeasonEnded(false);
   };

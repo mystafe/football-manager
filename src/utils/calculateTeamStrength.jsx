@@ -1,8 +1,13 @@
-import { calculatePlayerStrength } from './calculatePlayerStrength';
-
 export const calculateTeamStrength = (team) => {
-  const totalStrength = team.players.reduce((sum, player) => {
-    return sum + calculatePlayerStrength(player);
+  if (!team.players || team.players.length === 0) {
+    return 0;
+  }
+
+  const totalStrength = team.players.reduce((total, player) => {
+    const playerStrength = player.strength || 0;
+    return total + playerStrength;
   }, 0);
-  return totalStrength / team.players.length;
+
+  const averageStrength = totalStrength / team.players.length;
+  return isNaN(averageStrength) ? 0 : averageStrength;
 };

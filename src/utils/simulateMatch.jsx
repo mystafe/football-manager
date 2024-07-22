@@ -1,11 +1,18 @@
 import { calculateTeamStrength } from './calculateTeamStrength';
 
-export const simulateMatch = (teamA, teamB) => {
-  const teamAStrength = calculateTeamStrength(teamA);
-  const teamBStrength = calculateTeamStrength(teamB);
+export const simulateMatch = (teamA, teamB, isHomeTeamA = true) => {
+  const teamAStrength = calculateTeamStrength(teamA) || 0;
+  const teamBStrength = calculateTeamStrength(teamB) || 0;
 
   const totalStrength = teamAStrength + teamBStrength;
-  const teamAWinProbability = teamAStrength / totalStrength;
+  
+  // Ev sahibi avantajı %10 olarak ayarlanmıştır
+  const homeAdvantage = isHomeTeamA ? 0.1 : -0.1;
+  
+  // Güçlü takımın kazanma olasılığını daha da artırmak için güç oranı
+  const strengthAdvantage = ((teamAStrength - teamBStrength) / totalStrength) * 0.2 || 0;
+
+  const teamAWinProbability = (teamAStrength / totalStrength) + homeAdvantage + strengthAdvantage || 0.5;
 
   const randomValue = Math.random();
   let teamAScore = 0;
@@ -19,6 +26,21 @@ export const simulateMatch = (teamA, teamB) => {
     teamBScore = Math.floor(Math.random() * 4) + 1; // Team B scores 1-4 goals
   }
 
+  //logAll
+  console.table({
+    teamA: {
+      name: teamA.name,
+      strength: teamAStrength,
+      winProbability: teamAWinProbability,
+      score: teamAScore
+    },
+    teamB: {
+      name: teamB.name,
+      strength: teamBStrength,
+      winProbability: 1 - teamAWinProbability,
+      score: teamBScore
+    }
+  });
   const teamAGoals = [];
   const teamBGoals = [];
 

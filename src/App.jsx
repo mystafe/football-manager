@@ -5,7 +5,7 @@ import LeagueTable from './components/LeagueTable';
 const App = () => {
   return (
     <div>
-      <h1>Football Manager</h1>
+      <h1>Football Manager by Mustafa Evleksiz - 0.2.1</h1>
       <TeamList />
       <LeagueTable />
     </div>
