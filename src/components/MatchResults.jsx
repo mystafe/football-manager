@@ -1,27 +1,36 @@
 import React from 'react';
 
 const MatchResults = ({ matches }) => {
+  if (!matches || matches.length === 0) {
+    return <p>No match results available.</p>;
+  }
+
   return (
     <div>
       <h2>Match Results</h2>
       {matches.map((week, index) => (
         <div key={index}>
           <h3>Week {week.week}</h3>
-          <ul>
-            {week.matches.map((result, matchIndex) => (
-              <li key={matchIndex}>
-                <div>{result.teamA.name} {result.teamA.score} - {result.teamB.score} {result.teamB.name}</div>
-                <div>
-                  {result.teamA.goals.map((goal, idx) => (
-                    <span key={idx}>{goal}{idx < result.teamA.goals.length - 1 ? ', ' : ''}</span>
-                  ))} - 
-                  {result.teamB.goals.map((goal, idx) => (
-                    <span key={idx}>{goal}{idx < result.teamB.goals.length - 1 ? ', ' : ''}</span>
+          {week.matches && week.matches.length > 0 ? (
+            week.matches.map((match, matchIndex) => (
+              <div key={matchIndex}>
+                <p>
+                  {match.teamA.name} {match.teamA.score} - {match.teamB.score} {match.teamB.name}
+                </p>
+                <p>Goals:</p>
+                <ul>
+                  {match.teamA.goals.map((goal, goalIndex) => (
+                    <li key={goalIndex}>{goal} (Team A)</li>
                   ))}
-                </div>
-              </li>
-            ))}
-          </ul>
+                  {match.teamB.goals.map((goal, goalIndex) => (
+                    <li key={goalIndex}>{goal} (Team B)</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          ) : (
+            <p>No matches this week.</p>
+          )}
         </div>
       ))}
     </div>
