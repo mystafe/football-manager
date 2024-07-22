@@ -12,6 +12,7 @@ import { updateTable } from '../utils/updateTable';
 import { determineTopScorer } from '../utils/determineTopScorer';
 import { updatePlayerStats } from '../utils/updatePlayerStats';
 import { generateFixture } from '../utils/generateFixture';
+import { Fixture, StartMatchesButton, NextWeekButton } from './LeagueTableHelpers';
 
 const LeagueTable = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
@@ -21,6 +22,7 @@ const LeagueTable = () => {
   const [topScorer, setTopScorer] = useState(null);
   const [seasonEnded, setSeasonEnded] = useState(false);
   const [fixtureGenerated, setFixtureGenerated] = useState(false);
+  const [showFixture, setShowFixture] = useState(false);
 
   useEffect(() => {
     const initialTable = initializeTable(teamsData);
@@ -30,15 +32,22 @@ const LeagueTable = () => {
   }, []);
 
   const handleGenerateFixture = (teams) => {
-    const fixture = generateFixture(teams);
+    const shuffledTeams = [...teams].sort(() => 0.5 - Math.random());
+    const fixture = generateFixture(shuffledTeams);
     setMatches(fixture);
     setFixtureGenerated(true);
+    setShowFixture(true);
+  };
+
+  const handleStartMatches = () => {
+    handleNextWeek();
+    setShowFixture(false);
   };
 
   const handleNextWeek = () => {
     if (seasonEnded) return;
 
-    const weekMatches = matches.slice(currentWeek * (teamsData.length / 2), (currentWeek + 1) * (teamsData.length / 2));
+    const weekMatches = matches[currentWeek].matches;
     const results = [];
 
     weekMatches.forEach(match => {
@@ -57,9 +66,9 @@ const LeagueTable = () => {
       ...prevMatches.slice(currentWeek + 1)
     ]);
 
-    setCurrentWeek(currentWeek + 1);
+    setCurrentWeek(prevWeek => prevWeek + 1);
 
-    if (currentWeek + 1 >= matches.length / (teamsData.length / 2)) {
+    if (currentWeek + 1 >= matches.length) {
       setSeasonEnded(true);
       setTopScorer(determineTopScorer(matches));
     }
@@ -75,6 +84,7 @@ const LeagueTable = () => {
     setTopScorer(null);
     setSeasonEnded(false);
     setFixtureGenerated(false);
+    setShowFixture(false);
   };
 
   const sortedTable = [...table].sort((a, b) => b.points - a.points);
@@ -82,22 +92,35 @@ const LeagueTable = () => {
   return (
     <div>
       {!fixtureGenerated ? (
-        <FixtureScreen teams={teamsData} onGenerateFixture={handleGenerateFixture} />
+        <FixtureScreen 
+          teams={teamsData} 
+          onGenerateFixture={handleGenerateFixture} 
+          fixture={matches} 
+          onStartMatches={handleStartMatches} 
+        />
       ) : (
         <>
           <h1>League Table</h1>
-          <button onClick={handleNextWeek} disabled={seasonEnded}>Next Week</button>
-          {seasonEnded && (
-            <SeasonSummary
-              champion={sortedTable[0].name}
-              relegated={sortedTable[sortedTable.length - 1].name}
-              topScorer={topScorer}
-              resetSeason={resetSeason}
-            />
+          {showFixture ? (
+            <Fixture matches={matches} handleStartMatches={handleStartMatches} />
+          ) : (
+            <>
+              <NextWeekButton handleNextWeek={handleNextWeek} seasonEnded={seasonEnded} />
+              {seasonEnded && (
+                <SeasonSummary
+                  champion={sortedTable[0].name}
+                  relegated={sortedTable[sortedTable.length - 1].name}
+                  topScorer={topScorer}
+                  resetSeason={resetSeason}
+                />
+              )}
+              <TeamTable table={sortedTable} />
+              {currentWeek > 0 && (
+                <MatchResults matches={matches.slice(0, currentWeek)} />
+              )}
+              <PlayerStats stats={playerStats} />
+            </>
           )}
-          <TeamTable table={sortedTable} />
-          <MatchResults matches={matches.slice(0, currentWeek)} />
-          <PlayerStats stats={playerStats} />
         </>
       )}
     </div>

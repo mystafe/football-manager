@@ -1,104 +1,44 @@
-import { calculatePlayerStrength } from './calculatePlayerStrength';
+export const updatePlayerStats = (playerStats, matchResult) => {
+  const { home, away } = matchResult;
 
-export const updatePlayerStats = (playerStats, result) => {
-  const updatedStats = playerStats.map(player => {
-    const newPlayer = { ...player };
-    if (isNaN(newPlayer.strength)) {
-      newPlayer.strength = 0; // Eğer oyuncu gücü NaN ise, sıfır olarak ayarla
+  const updateGoals = (team, isHome) => {
+    if (team && team.goals && Array.isArray(team.goals)) {
+      team.goals.forEach(goalScorer => {
+        const player = playerStats.find(p => p.name === goalScorer);
+        if (player) {
+          player.goals += 1;
+          player.strengthChange = (player.strengthChange || 0) + 3; // Gol atan oyuncunun gücü artar
+        }
+      });
+
+      if (team.players && Array.isArray(team.players)) {
+        team.players.forEach(p => {
+          if (p.position === 'DEF' || p.position === 'GK') {
+            const player = playerStats.find(player => player.name === p.name);
+            if (player) {
+              if (isHome) {
+                player.strengthChange = (player.strengthChange || 0) + 1;
+              } else {
+                player.strengthChange = (player.strengthChange || 0) - 1;
+              }
+            }
+          }
+        });
+      }
     }
-    return newPlayer;
-  });
+  };
 
-  // Gol atan oyuncuların güçlerini güncelle
-  if (result.teamA.goals) {
-    result.teamA.goals.forEach(goalScorer => {
-      const player = updatedStats.find(p => p.name === goalScorer);
-      if (player) {
-        player.goals += 1;
-        player.strength += 3;
-        player.strengthChange += 3;
-      }
-    });
-  }
+  updateGoals(home, true);
+  updateGoals(away, false);
 
-  if (result.teamB.goals) {
-    result.teamB.goals.forEach(goalScorer => {
-      const player = updatedStats.find(p => p.name === goalScorer);
-      if (player) {
-        player.goals += 1;
-        player.strength += 3;
-        player.strengthChange += 3;
-      }
-    });
-  }
-
-  // Gol atamayan oyuncuların güçlerini güncelle
-  updatedStats.forEach(player => {
+  return playerStats.map(player => {
+    // Gol atamayan oyuncuların güçleri azalır
     if (
-      (!result.teamA.goals || !result.teamA.goals.includes(player.name)) &&
-      (!result.teamB.goals || !result.teamB.goals.includes(player.name))
+      !(home.goals && home.goals.includes(player.name)) &&
+      !(away.goals && away.goals.includes(player.name))
     ) {
-      player.strength -= 1;
-      player.strengthChange -= 1;
+      player.strengthChange = (player.strengthChange || 0) - 1;
     }
+    return player;
   });
-
-  // Takımın gol yememe ve yeme durumuna göre güç güncellemesi
-  if (result.teamB.score === 0 && result.teamA.players) {
-    result.teamA.players.forEach(playerName => {
-      const player = updatedStats.find(p => p.name === playerName);
-      if (player) {
-        if (player.position === 'DEF') {
-          player.strength += 1;
-          player.strengthChange += 1;
-        } else if (player.position === 'GK') {
-          player.strength += 3;
-          player.strengthChange += 3;
-        }
-      }
-    });
-  } else if (result.teamA.players) {
-    result.teamA.players.forEach(playerName => {
-      const player = updatedStats.find(p => p.name === playerName);
-      if (player) {
-        if (player.position === 'DEF') {
-          player.strength -= 1;
-          player.strengthChange -= 1;
-        } else if (player.position === 'GK') {
-          player.strength -= 1;
-          player.strengthChange -= 1;
-        }
-      }
-    });
-  }
-
-  if (result.teamA.score === 0 && result.teamB.players) {
-    result.teamB.players.forEach(playerName => {
-      const player = updatedStats.find(p => p.name === playerName);
-      if (player) {
-        if (player.position === 'DEF') {
-          player.strength += 1;
-          player.strengthChange += 1;
-        } else if (player.position === 'GK') {
-          player.strength += 3;
-          player.strengthChange += 3;
-        }
-      }
-    });
-  } else if (result.teamB.players) {
-    result.teamB.players.forEach(playerName => {
-      const player = updatedStats.find(p => p.name === playerName);
-      if (player) {
-        if (player.position === 'DEF') {
-          player.strength -= 1;
-          player.strengthChange -= 1;
-        } else if (player.position === 'GK') {
-          player.strength -= 1;
-          player.strengthChange -= 1;
-        }
-      }
-    });
-  }
-
-  return updatedStats;
 };

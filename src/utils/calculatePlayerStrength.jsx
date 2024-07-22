@@ -1,22 +1,14 @@
 export const calculatePlayerStrength = (player) => {
-  let strength;
-
   switch (player.position) {
     case 'GK':
-      strength = player.goalkeeping * 0.85 + player.defense * 0.15;
-      break;
+      return player.goalkeeping * 0.85 + player.defense * 0.15;
     case 'DEF':
-      strength = player.defense * 0.7 + player.attack * 0.3;
-      break;
+      return player.defense * 0.7 + player.attack * 0.3;
     case 'MID':
-      strength = player.attack * 0.65 + player.defense * 0.35;
-      break;
+      return player.attack * 0.65 + player.defense * 0.35;
     case 'FWD':
-      strength = player.attack * 0.85 + player.defense * 0.15;
-      break;
+      return player.attack * 0.85 + player.defense * 0.15;
     default:
-      strength = 0;
+      return 0;
   }
-
-  return isNaN(strength) ? 0 : strength;
 };

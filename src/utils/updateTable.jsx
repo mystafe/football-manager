@@ -1,38 +1,40 @@
 import { calculateTeamStrength } from './calculateTeamStrength';
 
 export const updateTable = (table, result, playerStats) => {
+  if (!result || !result.home || !result.away) {
+    console.error('Invalid match result:', result);
+    return table;
+  }
+
   const updatedTable = table.map(team => {
-    if (team.name === result.teamA.name) {
-      const updatedTeamAPlayers = playerStats.filter(p => p.team === team.name);
-      const updatedTeamAStrength = calculateTeamStrength({ players: updatedTeamAPlayers }) || 0;
-
-      return {
-        ...team,
-        strength: updatedTeamAStrength,
-        played: team.played + 1,
-        goalsFor: team.goalsFor + result.teamA.score,
-        goalsAgainst: team.goalsAgainst + result.teamB.score,
-        won: team.won + (result.teamA.score > result.teamB.score ? 1 : 0),
-        drawn: team.drawn + (result.teamA.score === result.teamB.score ? 1 : 0),
-        lost: team.lost + (result.teamA.score < result.teamB.score ? 1 : 0),
-        points: team.points + (result.teamA.score > result.teamB.score ? 3 : result.teamA.score === result.teamB.score ? 1 : 0)
-      };
-    } else if (team.name === result.teamB.name) {
-      const updatedTeamBPlayers = playerStats.filter(p => p.team === team.name);
-      const updatedTeamBStrength = calculateTeamStrength({ players: updatedTeamBPlayers }) || 0;
-
-      return {
-        ...team,
-        strength: updatedTeamBStrength,
-        played: team.played + 1,
-        goalsFor: team.goalsFor + result.teamB.score,
-        goalsAgainst: team.goalsAgainst + result.teamA.score,
-        won: team.won + (result.teamB.score > result.teamA.score ? 1 : 0),
-        drawn: team.drawn + (result.teamB.score === result.teamA.score ? 1 : 0),
-        lost: team.lost + (result.teamB.score < result.teamA.score ? 1 : 0),
-        points: team.points + (result.teamB.score > result.teamA.score ? 3 : result.teamB.score === result.teamA.score ? 1 : 0)
-      };
+    if (team.name === result.home.name) {
+      team.played += 1;
+      team.goalsFor += result.home.score;
+      team.goalsAgainst += result.away.score;
+      if (result.home.score > result.away.score) {
+        team.won += 1;
+        team.points += 3;
+      } else if (result.home.score < result.away.score) {
+        team.lost += 1;
+      } else {
+        team.drawn += 1;
+        team.points += 1;
+      }
+    } else if (team.name === result.away.name) {
+      team.played += 1;
+      team.goalsFor += result.away.score;
+      team.goalsAgainst += result.home.score;
+      if (result.away.score > result.home.score) {
+        team.won += 1;
+        team.points += 3;
+      } else if (result.away.score < result.home.score) {
+        team.lost += 1;
+      } else {
+        team.drawn += 1;
+        team.points += 1;
+      }
     }
+    team.strength = calculateTeamStrength(team, playerStats);
     return team;
   });
 
