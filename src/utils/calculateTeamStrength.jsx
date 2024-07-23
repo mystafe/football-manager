@@ -5,6 +5,13 @@ export const calculateTeamStrength = (team) => {
     return 0;
   }
 
-  const totalStrength = team.players.reduce((sum, player) => sum + calculatePlayerStrength(player), 0);
-  return totalStrength / team.players.length;
+  const totalStrength = team.players.reduce((sum, player) => {
+    const playerStrength = calculatePlayerStrength(player);
+    console.log(`Player: ${player.name}, Strength: ${playerStrength}`);
+    return sum + playerStrength;
+  }, 0);
+
+  const teamStrength = totalStrength / team.players.length;
+  console.log(`Team: ${team.name}, Strength: ${teamStrength}`);
+  return teamStrength;
 };

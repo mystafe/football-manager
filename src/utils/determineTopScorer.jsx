@@ -1,23 +1,33 @@
-export const determineTopScorer = (allMatches) => {
+export const determineTopScorer = (matches) => {
   const playerGoals = {};
-  allMatches.forEach(week => {
+
+  matches.forEach(week => {
     week.matches.forEach(match => {
-      match.teamA.goals.forEach(player => {
-        if (playerGoals[player]) {
-          playerGoals[player] += 1;
-        } else {
-          playerGoals[player] = 1;
+      match.home.goals.forEach(playerName => {
+        if (!playerGoals[playerName]) {
+          playerGoals[playerName] = 0;
         }
+        playerGoals[playerName] += 1;
       });
-      match.teamB.goals.forEach(player => {
-        if (playerGoals[player]) {
-          playerGoals[player] += 1;
-        } else {
-          playerGoals[player] = 1;
+
+      match.away.goals.forEach(playerName => {
+        if (!playerGoals[playerName]) {
+          playerGoals[playerName] = 0;
         }
+        playerGoals[playerName] += 1;
       });
     });
   });
 
-  return Object.keys(playerGoals).reduce((a, b) => playerGoals[a] > playerGoals[b] ? a : b);
+  let topScorer = null;
+  let maxGoals = 0;
+
+  for (const playerName in playerGoals) {
+    if (playerGoals[playerName] > maxGoals) {
+      maxGoals = playerGoals[playerName];
+      topScorer = { name: playerName, goals: maxGoals };
+    }
+  }
+
+  return topScorer;
 };

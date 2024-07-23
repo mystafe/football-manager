@@ -47,17 +47,17 @@ const LeagueTable = () => {
   const handleNextWeek = () => {
     if (seasonEnded) return;
 
-    const weekMatches = matches[currentWeek].matches;
+    const weekMatches = matches[currentWeek]?.matches || [];
     const results = [];
 
     weekMatches.forEach(match => {
       const result = simulateMatch(match.home, match.away, true);
       results.push(result);
-      setPlayerStats(prevStats => {
-        const updatedStats = updatePlayerStats(prevStats, result);
-        setTable(prevTable => updateTable(prevTable, result, updatedStats));
-        return updatedStats;
-      });
+    });
+
+    results.forEach(result => {
+      setTable(prevTable => updateTable(prevTable, result));
+      setPlayerStats(prevStats => updatePlayerStats(prevStats, result));
     });
 
     setMatches(prevMatches => [
@@ -88,6 +88,10 @@ const LeagueTable = () => {
   };
 
   const sortedTable = [...table].sort((a, b) => b.points - a.points);
+
+  useEffect(() => {
+    console.log('Table updated:', table);
+  }, [table]);
 
   return (
     <div>
