@@ -1,15 +1,23 @@
 export const initializePlayerStats = (teams) => {
   const playerStats = [];
+
   teams.forEach(team => {
-    team.players.forEach(player => {
-      playerStats.push({
-        name: player.name,
-        team: team.name,
-        goals: 0,
-        strength: player.strength || 0,
-        position: player.position,
+    if (team.players && Array.isArray(team.players)) {
+      team.players.forEach(player => {
+        playerStats.push({
+          name: player.name,
+          position: player.position,
+          goalkeeping: player.goalkeeping,
+          defense: player.defense,
+          midfield: player.midfield,
+          attack: player.attack,
+          strength: player.strength,
+          goals: player.goals,
+          team: team.name
+        });
       });
-    });
+    }
   });
+
   return playerStats;
 };

@@ -2,12 +2,12 @@ import React from 'react';
 
 const PlayerStats = ({ stats }) => {
   // Oyuncuları önce attıkları gollere göre, sonra da güçlerine göre sırala
-  const sortedStats = [...stats].sort((a, b) => {
+  const sortedStats = Array.isArray(stats) ? [...stats].sort((a, b) => {
     if (b.goals === a.goals) {
       return b.strength - a.strength;
     }
     return b.goals - a.goals;
-  });
+  }) : [];
 
   return (
     <div>

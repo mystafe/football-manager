@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { simulateMatch } from '../utils/simulateMatch';
-import TeamTable from './TeamTable';
-import MatchResults from './MatchResults';
-import SeasonSummary from './SeasonSummary';
-import PlayerStats from './PlayerStats';
-import FixtureScreen from './FixtureScreen';
 import { initializeTable } from '../utils/initializeTable';
 import { initializePlayerStats } from '../utils/initializePlayerStats';
 import { updateTable } from '../utils/updateTable';
-import { determineTopScorer } from '../utils/determineTopScorer';
-import { updatePlayerStats } from '../utils/updatePlayerStats';
+import determineTopScorer from '../utils/determineTopScorer';
+import { updatePlayerStatsAfterMatch } from '../utils/updatePlayerStatsAfterMatch';
+import TeamTable from './TeamTable';
+import MatchResults from './MatchResults';
+import PlayerStats from './PlayerStats';
+import SeasonSummary from './SeasonSummary';
+import FixtureScreen from './FixtureScreen';
 import { generateFixture } from '../utils/generateFixture';
-import { Fixture, StartMatchesButton, NextWeekButton } from './LeagueTableHelpers';
+import { Fixture, NextWeekButton } from './LeagueTableHelpers';
 
 const LeagueTable = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
@@ -23,28 +23,25 @@ const LeagueTable = () => {
   const [seasonEnded, setSeasonEnded] = useState(false);
   const [fixtureGenerated, setFixtureGenerated] = useState(false);
   const [showFixture, setShowFixture] = useState(false);
-  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchData = async () => {
       try {
-        console.log("API URL:", process.env.REACT_APP_API_URL); // Bu satırı ekleyin
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/teams`);
-        const teamsData = response.data;
-        setTeams(teamsData);
+        const teamsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/teams`);
+        const teamsData = teamsResponse.data;
         const initialTable = initializeTable(teamsData);
         const initialPlayerStats = initializePlayerStats(teamsData);
         setTable(initialTable);
         setPlayerStats(initialPlayerStats);
       } catch (error) {
-        console.error("Error fetching teams:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchTeams();
+    fetchData();
   }, []);
 
-  const handleGenerateFixture = () => {
+  const handleGenerateFixture = (teams) => {
     const shuffledTeams = [...teams].sort(() => 0.5 - Math.random());
     const fixture = generateFixture(shuffledTeams);
     setMatches(fixture);
@@ -64,13 +61,18 @@ const LeagueTable = () => {
     const results = [];
 
     weekMatches.forEach(match => {
-      const result = simulateMatch(match.home, match.away, true);
-      results.push(result);
+      const homeTeam = table.find(team => team.name === match.home.name);
+      const awayTeam = table.find(team => team.name === match.away.name);
+
+      if (homeTeam && awayTeam) {
+        const result = simulateMatch({ ...homeTeam, players: match.home.players }, { ...awayTeam, players: match.away.players }, true);
+        results.push(result);
+      }
     });
 
     results.forEach(result => {
       setTable(prevTable => updateTable(prevTable, result));
-      setPlayerStats(prevStats => updatePlayerStats(prevStats, result));
+      setPlayerStats(prevStats => updatePlayerStatsAfterMatch(prevStats, result));
     });
 
     setMatches(prevMatches => [
@@ -88,41 +90,35 @@ const LeagueTable = () => {
   };
 
   const resetSeason = () => {
-    const fetchTeams = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/teams`);
-        const teamsData = response.data;
-        setTeams(teamsData);
+        const teamsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/teams`);
+        const teamsData = teamsResponse.data;
         const initialTable = initializeTable(teamsData);
         const initialPlayerStats = initializePlayerStats(teamsData);
-        setCurrentWeek(0);
-        setMatches([]);
         setTable(initialTable);
         setPlayerStats(initialPlayerStats);
+        setCurrentWeek(0);
+        setMatches([]);
         setTopScorer(null);
         setSeasonEnded(false);
         setFixtureGenerated(false);
         setShowFixture(false);
       } catch (error) {
-        console.error("Error resetting season:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchTeams();
+    fetchData();
   };
 
   const sortedTable = [...table].sort((a, b) => b.points - a.points);
-
-  useEffect(() => {
-    console.log('Table updated:', table);
-    console.log("API URL:", process.env.REACT_APP_API_URL);
-  }, [table]);
 
   return (
     <div>
       {!fixtureGenerated ? (
         <FixtureScreen 
-          teams={teams} 
+          teams={table} 
           onGenerateFixture={handleGenerateFixture} 
           fixture={matches} 
           onStartMatches={handleStartMatches} 

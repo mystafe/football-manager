@@ -2,6 +2,7 @@ import React from 'react';
 import TeamList from './components/TeamList';
 import LeagueTable from './components/LeagueTable';
 
+
 const App = () => {
   return (
     <div>

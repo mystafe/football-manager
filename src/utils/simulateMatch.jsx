@@ -1,6 +1,17 @@
 import { calculateTeamStrength } from './calculateTeamStrength';
+import { updatePlayerStatsAfterMatch } from './updatePlayerStatsAfterMatch';
 
 export const simulateMatch = (home, away, isHomeTeamA = true) => {
+  if (!home || !home.players || !Array.isArray(home.players)) {
+    console.error('Home team or players are undefined or not an array:', home);
+    return null;
+  }
+
+  if (!away || !away.players || !Array.isArray(away.players)) {
+    console.error('Away team or players are undefined or not an array:', away);
+    return null;
+  }
+
   const homeStrength = calculateTeamStrength(home) || 0;
   const awayStrength = calculateTeamStrength(away) || 0;
 
@@ -31,19 +42,17 @@ export const simulateMatch = (home, away, isHomeTeamA = true) => {
   const homeGoals = [];
   const awayGoals = [];
 
-  if (home.players && Array.isArray(home.players)) {
-    for (let i = 0; i < homeScore; i++) {
-      const randomPlayer = home.players[Math.floor(Math.random() * home.players.length)];
-      homeGoals.push(randomPlayer.name);
-    }
+  for (let i = 0; i < homeScore; i++) {
+    const randomPlayer = home.players[Math.floor(Math.random() * home.players.length)];
+    homeGoals.push(randomPlayer.name);
   }
 
-  if (away.players && Array.isArray(away.players)) {
-    for (let i = 0; i < awayScore; i++) {
-      const randomPlayer = away.players[Math.floor(Math.random() * away.players.length)];
-      awayGoals.push(randomPlayer.name);
-    }
+  for (let i = 0; i < awayScore; i++) {
+    const randomPlayer = away.players[Math.floor(Math.random() * away.players.length)];
+    awayGoals.push(randomPlayer.name);
   }
+
+  updatePlayerStatsAfterMatch(home, away, homeScore, awayScore);
 
   return {
     home: {

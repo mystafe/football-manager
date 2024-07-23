@@ -5,9 +5,12 @@ const TeamList = () => {
   const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    axios.get('/data/teams.json')
+    axios.get(`${process.env.REACT_APP_API_URL}/api/teams`)
       .then(response => {
         setTeams(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching teams:', error);
       });
   }, []);
 
@@ -16,7 +19,16 @@ const TeamList = () => {
       <h1>Teams</h1>
       <ul>
         {teams.map(team => (
-          <li key={team.id}>{team.name}</li>
+          <li key={team._id}>
+            {team.name}
+            <ul>
+              {team.players.map(player => (
+                <li key={player._id}>
+                  {player.name} - {player.position}
+                </li>
+              ))}
+            </ul>
+          </li>
         ))}
       </ul>
     </div>
