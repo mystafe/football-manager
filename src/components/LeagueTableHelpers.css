@@ -1,0 +1,19 @@
+.fixtures {
+  margin-bottom: 20px;
+}
+
+.fixtures-list {
+  list-style: none;
+  padding: 0;
+}
+
+.fixtures-list li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #f4f4f9;
+  border-radius: 5px;
+}
+
+.fixtures-list li:hover {
+  background-color: #ddd;
+}

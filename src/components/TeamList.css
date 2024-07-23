@@ -1,0 +1,19 @@
+.teams {
+  margin-bottom: 20px;
+}
+
+.teams-list {
+  list-style: none;
+  padding: 0;
+}
+
+.teams-list li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #f4f4f9;
+  border-radius: 5px;
+}
+
+.teams-list li:hover {
+  background-color: #ddd;
+}

@@ -1,26 +1,22 @@
 import React from 'react';
-import TeamList from './components/TeamList';
 import LeagueTable from './components/LeagueTable';
+import './App.css';
 
-
-const App = () => {
+function App() {
   return (
-    <div>
-      <h1>Football Manager by Mustafa Evleksiz - 0.2.1</h1>
-      <TeamList />
+    <div className="container">
+      <h1>Football Manager</h1>
+      <nav>
+        <a href="#teams">Teams</a>
+        <a href="#fixtures">Fixture</a>
+        <a href="#results">Results</a>
+      </nav>
       <LeagueTable />
-
-      {/* TO-DO */}
-      {/* visual improvements
-      onload fixture generation
-      team gains??
-      mongo db integration
-      more than 4 teams and 11 players */}
-
-      
-
+      <footer>
+        <p>Developed by Mustafa Evleksiz</p>
+      </footer>
     </div>
   );
-};
+}
 
 export default App;
