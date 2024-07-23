@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import teamsData from '../data/teams.json';
+import axios from 'axios';
 import { simulateMatch } from '../utils/simulateMatch';
 import TeamTable from './TeamTable';
 import MatchResults from './MatchResults';
@@ -23,15 +23,28 @@ const LeagueTable = () => {
   const [seasonEnded, setSeasonEnded] = useState(false);
   const [fixtureGenerated, setFixtureGenerated] = useState(false);
   const [showFixture, setShowFixture] = useState(false);
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
-    const initialTable = initializeTable(teamsData);
-    const initialPlayerStats = initializePlayerStats(teamsData);
-    setTable(initialTable);
-    setPlayerStats(initialPlayerStats);
+    const fetchTeams = async () => {
+      try {
+        console.log("API URL:", process.env.REACT_APP_API_URL); // Bu satırı ekleyin
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/teams`);
+        const teamsData = response.data;
+        setTeams(teamsData);
+        const initialTable = initializeTable(teamsData);
+        const initialPlayerStats = initializePlayerStats(teamsData);
+        setTable(initialTable);
+        setPlayerStats(initialPlayerStats);
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
+
+    fetchTeams();
   }, []);
 
-  const handleGenerateFixture = (teams) => {
+  const handleGenerateFixture = () => {
     const shuffledTeams = [...teams].sort(() => 0.5 - Math.random());
     const fixture = generateFixture(shuffledTeams);
     setMatches(fixture);
@@ -75,16 +88,27 @@ const LeagueTable = () => {
   };
 
   const resetSeason = () => {
-    const initialTable = initializeTable(teamsData);
-    const initialPlayerStats = initializePlayerStats(teamsData);
-    setCurrentWeek(0);
-    setMatches([]);
-    setTable(initialTable);
-    setPlayerStats(initialPlayerStats);
-    setTopScorer(null);
-    setSeasonEnded(false);
-    setFixtureGenerated(false);
-    setShowFixture(false);
+    const fetchTeams = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/teams`);
+        const teamsData = response.data;
+        setTeams(teamsData);
+        const initialTable = initializeTable(teamsData);
+        const initialPlayerStats = initializePlayerStats(teamsData);
+        setCurrentWeek(0);
+        setMatches([]);
+        setTable(initialTable);
+        setPlayerStats(initialPlayerStats);
+        setTopScorer(null);
+        setSeasonEnded(false);
+        setFixtureGenerated(false);
+        setShowFixture(false);
+      } catch (error) {
+        console.error("Error resetting season:", error);
+      }
+    };
+
+    fetchTeams();
   };
 
   const sortedTable = [...table].sort((a, b) => b.points - a.points);
@@ -97,7 +121,7 @@ const LeagueTable = () => {
     <div>
       {!fixtureGenerated ? (
         <FixtureScreen 
-          teams={teamsData} 
+          teams={teams} 
           onGenerateFixture={handleGenerateFixture} 
           fixture={matches} 
           onStartMatches={handleStartMatches} 
