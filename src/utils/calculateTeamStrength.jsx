@@ -2,6 +2,7 @@ import { calculatePlayerStrength } from './calculatePlayerStrength';
 
 export const calculateTeamStrength = (team) => {
   if (!team.players || team.players.length === 0) {
+    console.log(`Team ${team.name} has no players or players array is empty`);
     return 0;
   }
 
