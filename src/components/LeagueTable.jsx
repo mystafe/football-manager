@@ -115,6 +115,7 @@ const LeagueTable = () => {
 
   useEffect(() => {
     console.log('Table updated:', table);
+    console.log("API URL:", process.env.REACT_APP_API_URL);
   }, [table]);
 
   return (
