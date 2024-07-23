@@ -42,14 +42,18 @@ export const simulateMatch = (home, away, isHomeTeamA = true) => {
   const homeGoals = [];
   const awayGoals = [];
 
-  for (let i = 0; i < homeScore; i++) {
-    const randomPlayer = home.players[Math.floor(Math.random() * home.players.length)];
-    homeGoals.push(randomPlayer.name);
+  if (home.players && Array.isArray(home.players)) {
+    for (let i = 0; i < homeScore; i++) {
+      const randomPlayer = home.players[Math.floor(Math.random() * home.players.length)];
+      homeGoals.push(randomPlayer.name);
+    }
   }
 
-  for (let i = 0; i < awayScore; i++) {
-    const randomPlayer = away.players[Math.floor(Math.random() * away.players.length)];
-    awayGoals.push(randomPlayer.name);
+  if (away.players && Array.isArray(away.players)) {
+    for (let i = 0; i < awayScore; i++) {
+      const randomPlayer = away.players[Math.floor(Math.random() * away.players.length)];
+      awayGoals.push(randomPlayer.name);
+    }
   }
 
   updatePlayerStatsAfterMatch(home, away, homeScore, awayScore);

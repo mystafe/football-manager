@@ -1,7 +1,8 @@
 import React from 'react';
 
 const PlayerStats = ({ stats }) => {
-  // Oyuncuları önce attıkları gollere göre, sonra da güçlerine göre sırala
+  console.log('Player Stats Component:', stats); // Debugging
+
   const sortedStats = Array.isArray(stats) ? [...stats].sort((a, b) => {
     if (b.goals === a.goals) {
       return b.strength - a.strength;
