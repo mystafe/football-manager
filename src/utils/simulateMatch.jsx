@@ -4,12 +4,17 @@ export const simulateMatch = (home, away, isHomeTeamA = true) => {
   const homeStrength = calculateTeamStrength(home) || 0;
   const awayStrength = calculateTeamStrength(away) || 0;
 
+  console.log(`Home Team: ${home.name}, Strength: ${homeStrength}`);
+  console.log(`Away Team: ${away.name}, Strength: ${awayStrength}`);
+
   const totalStrength = homeStrength + awayStrength;
 
   const homeAdvantage = isHomeTeamA ? 0.1 : -0.1;
   const strengthAdvantage = ((homeStrength - awayStrength) / totalStrength) * 0.2 || 0;
 
   const homeWinProbability = (homeStrength / totalStrength) + homeAdvantage + strengthAdvantage || 0.5;
+
+  console.log(`Home Win Probability: ${homeWinProbability}`);
 
   const randomValue = Math.random();
   let homeScore = 0;
