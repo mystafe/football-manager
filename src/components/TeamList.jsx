@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { List, ListItem, ListItemText, Typography, Box, Paper } from '@mui/material';
 
 const TeamList = () => {
   const [teams, setTeams] = useState([]);
@@ -15,23 +16,18 @@ const TeamList = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Teams</h1>
-      <ul>
-        {teams.map(team => (
-          <li key={team._id}>
-            {team.name}
-            <ul>
-              {team.players.map(player => (
-                <li key={player._id}>
-                  {player.name} - {player.position}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Box mt={4}>
+      <Typography variant="h6" component="h2" align="center">Teams</Typography>
+      <Paper style={{ marginTop: '20px', padding: '10px' }}>
+        <List>
+          {teams.map(team => (
+            <ListItem key={team.id}>
+              <ListItemText primary={team.name} />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </Box>
   );
 };
 

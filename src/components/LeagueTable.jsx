@@ -12,7 +12,8 @@ import PlayerStats from './PlayerStats';
 import SeasonSummary from './SeasonSummary';
 import FixtureScreen from './FixtureScreen';
 import { generateFixture } from '../utils/generateFixture';
-import { Fixture, NextWeekButton } from './LeagueTableHelpers';
+import { Fixture, NextWeekButton, GenerateFixtureButton, ResetSeasonButton } from './LeagueTableHelpers';
+import { Container, Box, Typography, Paper } from '@mui/material';
 
 const LeagueTable = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
@@ -28,8 +29,6 @@ const LeagueTable = () => {
     const fetchData = async () => {
       try {
         const teamsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/teams`);
-        console.log("url", process.env.REACT_APP_API_URL);
-        console.log("entire url", `${process.env.REACT_APP_API_URL}/api/teams`);
         const teamsData = teamsResponse.data;
         const initialTable = initializeTable(teamsData);
         const initialPlayerStats = initializePlayerStats(teamsData);
@@ -117,40 +116,47 @@ const LeagueTable = () => {
   const sortedTable = [...table].sort((a, b) => b.points - a.points);
 
   return (
-    <div>
-      {!fixtureGenerated ? (
-        <FixtureScreen 
-          teams={table} 
-          onGenerateFixture={handleGenerateFixture} 
-          fixture={matches} 
-          onStartMatches={handleStartMatches} 
-        />
-      ) : (
-        <>
-          <h1>League Table</h1>
-          {showFixture ? (
-            <Fixture matches={matches} handleStartMatches={handleStartMatches} />
-          ) : (
-            <>
-              <NextWeekButton handleNextWeek={handleNextWeek} seasonEnded={seasonEnded} />
-              {seasonEnded && (
-                <SeasonSummary
-                  champion={sortedTable[0].name}
-                  relegated={sortedTable[sortedTable.length - 1].name}
-                  topScorer={topScorer}
-                  resetSeason={resetSeason}
-                />
-              )}
-              <TeamTable table={sortedTable} />
-              {currentWeek > 0 && (
-                <MatchResults matches={matches.slice(0, currentWeek)} />
-              )}
-              <PlayerStats stats={playerStats} />
-            </>
-          )}
-        </>
-      )}
-    </div>
+    <Container>
+      <Box mt={4}>
+        {!fixtureGenerated ? (
+          <FixtureScreen 
+            teams={table} 
+            onGenerateFixture={handleGenerateFixture} 
+            fixture={matches} 
+            onStartMatches={handleStartMatches} 
+          />
+        ) : (
+          <>
+            <Typography variant="h4" component="h1" align="center">League Table</Typography>
+            {showFixture ? (
+              <Fixture matches={matches} handleStartMatches={handleStartMatches} />
+            ) : (
+              <>
+                <NextWeekButton handleNextWeek={handleNextWeek} seasonEnded={seasonEnded} />
+                {seasonEnded && (
+                  <SeasonSummary
+                    champion={sortedTable[0].name}
+                    relegated={sortedTable[sortedTable.length - 1].name}
+                    topScorer={topScorer}
+                    resetSeason={resetSeason}
+                  />
+                )}
+                <Paper style={{ marginTop: '20px', padding: '10px' }}>
+                  <TeamTable table={sortedTable} />
+                  {currentWeek > 0 && (
+                    <MatchResults matches={matches.slice(0, currentWeek)} />
+                  )}
+                  <PlayerStats stats={playerStats} />
+                </Paper>
+                {seasonEnded && (
+                  <ResetSeasonButton handleReset={resetSeason} />
+                )}
+              </>
+            )}
+          </>
+        )}
+      </Box>
+    </Container>
   );
 };
 

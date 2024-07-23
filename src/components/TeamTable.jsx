@@ -1,38 +1,39 @@
 import React from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
-const TeamTable = ({ table }) => {
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Team</th>
-          <th>Strength</th>
-          <th>Played</th>
-          <th>Won</th>
-          <th>Drawn</th>
-          <th>Lost</th>
-          <th>Goals For</th>
-          <th>Goals Against</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody>
+const TeamTable = ({ table }) => (
+  <TableContainer component={Paper}>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Team</TableCell>
+          <TableCell align="right">P</TableCell>
+          <TableCell align="right">W</TableCell>
+          <TableCell align="right">D</TableCell>
+          <TableCell align="right">L</TableCell>
+          <TableCell align="right">GF</TableCell>
+          <TableCell align="right">GA</TableCell>
+          <TableCell align="right">GD</TableCell>
+          <TableCell align="right">Pts</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {table.map((team, index) => (
-          <tr key={index}>
-            <td>{team.name}</td>
-            <td>{team.strength.toFixed(2)}</td>
-            <td>{team.played}</td>
-            <td>{team.won}</td>
-            <td>{team.drawn}</td>
-            <td>{team.lost}</td>
-            <td>{team.goalsFor}</td>
-            <td>{team.goalsAgainst}</td>
-            <td>{team.points}</td>
-          </tr>
+          <TableRow key={index}>
+            <TableCell component="th" scope="row">{team.name}</TableCell>
+            <TableCell align="right">{team.played}</TableCell>
+            <TableCell align="right">{team.won}</TableCell>
+            <TableCell align="right">{team.drawn}</TableCell>
+            <TableCell align="right">{team.lost}</TableCell>
+            <TableCell align="right">{team.goalsFor}</TableCell>
+            <TableCell align="right">{team.goalsAgainst}</TableCell>
+            <TableCell align="right">{team.goalsFor - team.goalsAgainst}</TableCell>
+            <TableCell align="right">{team.points}</TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
-  );
-};
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
 
 export default TeamTable;
