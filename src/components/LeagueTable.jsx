@@ -28,6 +28,9 @@ const LeagueTable = () => {
     const fetchData = async () => {
       try {
         const teamsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/teams`);
+        console.log("url", process.env.REACT_APP_API_URL);
+
+        console.log("entire url", `${process.env.REACT_APP_API_URL}/api/teams`);
         const teamsData = teamsResponse.data;
         const initialTable = initializeTable(teamsData);
         const initialPlayerStats = initializePlayerStats(teamsData);
