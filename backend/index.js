@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 
-const dataPath = path.join(__dirname, '..', 'public', 'data', 'teams8.json');
+const dataPath = path.join(__dirname, 'data', 'teams8.json');
 
 app.get('/api/teams', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {

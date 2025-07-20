@@ -2,13 +2,15 @@
 
 Simple browser based manager game with a Node backend.
 
+The application no longer uses Heroku for hosting the API.
+
 ## Setup
 
-Install dependencies in both folders:
+Install dependencies for backend and client:
 
 ```bash
-npm install
-cd server && npm install
+cd backend && npm install
+cd ../client && npm install
 ```
 
 ## Running
@@ -16,8 +18,10 @@ cd server && npm install
 Start backend and frontend separately:
 
 ```bash
-node server/index.js
-npm start
+cd backend && npm start
+
+In a separate terminal run:
+cd client && npm start
 ```
 
-The frontend expects the backend at `http://localhost:3001`.
+The frontend reads the backend URL from the `.env` file using `REACT_APP_API_URL`.
